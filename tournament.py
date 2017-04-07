@@ -5,7 +5,6 @@
 
 import psycopg2
 
-
 SELECT_PLAYERS = "SELECT count(*) FROM player;"
 
 INSERT_PLAYER = """INSERT INTO player("NAME") VALUES (%s);"""
@@ -29,8 +28,6 @@ def connect():
     except:
         print "I am unable to connect to the database"
 
-
-
 def deleteMatches():
     """Remove all the match records from the database."""
     print "deleteMatches"
@@ -43,8 +40,6 @@ def deleteMatches():
 
     except psycopg2.Error as e:
         print e.pgerror
-
-
 
 def deletePlayers():
     """Remove all the player records from the database."""
@@ -59,7 +54,6 @@ def deletePlayers():
     except psycopg2.Error as e:
         print e.pgerror
 
-
 """Returns the number of players currently registered."""
 def countPlayers():
     print "countPlayers"
@@ -72,8 +66,6 @@ def countPlayers():
         return int(count)
     except psycopg2.Error as e:
         print e.pgerror
-
-
 
 def registerPlayer(name):
     """Adds a player to the tournament database.
@@ -95,8 +87,6 @@ def registerPlayer(name):
 
     except psycopg2.Error as e:
         print e.pgerror
-
-
 
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
@@ -123,7 +113,6 @@ def playerStandings():
     except psycopg2.Error as e:
         print e.pgerror
 
-
 def reportMatch(winner, loser):
     """Records the outcome of a single match between two players.
 
@@ -141,7 +130,6 @@ def reportMatch(winner, loser):
 
     except psycopg2.Error as e:
         print e.pgerror
-
  
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
@@ -170,23 +158,8 @@ def swissPairings():
     except psycopg2.Error as e:
         print e.pgerror
 
-
 def closeConnCur(conn, cur):
     if conn:
         conn.close()
     if cur:
         cur.close()
-
-if __name__ == '__main__':
-
-    #print registerPlayer("Boots O'Neal")
-    #print deletePlayers()
-    #print countPlayers()
-    #print reportMatch(11,8)
-    #print swissPairings()
-    #print playerStandings()
-    #deleteMatches()
-    #standings = playerStandings()
-    #[id1, id2, id3, id4] = [row[0] for row in standings]
-    #print standings
-    print "Success!  All tests pass!"
