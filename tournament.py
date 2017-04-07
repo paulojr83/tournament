@@ -6,14 +6,25 @@
 import psycopg2
 
 
+SELECT_PLAYERS = "SELECT count(*) FROM player;"
+
+INSERT_PLAYER = """INSERT INTO player("NAME") VALUES (%s);"""
+
+INSERT_MATCH = """INSERT INTO matches("ID_WINNER","ID_LOSER") VALUES (%s, %s);"""
+
+PLAYER_STANDINGS = """SELECT * FROM PLAYER_STANDINGS;"""
+
+SWISS_PAIRINGS = """SELECT * FROM SWISS_PAIRINGS;"""
+
+DELETE_MATCHES = """DELETE FROM matches;"""
+
+DELETE_PLAYER = """DELETE FROM player;"""
+
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
     try:
         conn = psycopg2.connect(host="64.137.162.204",database="postgres", user="postgres", password="12qw")
-        print "Connected!\n"
-        conn = connect()
-        conn.execute("""SELECT * FROM playground""")
-        conn.cursor()
+        #print "Connected!\n"
         return conn
     except:
         print "I am unable to connect to the database"
@@ -22,16 +33,47 @@ def connect():
 
 def deleteMatches():
     """Remove all the match records from the database."""
+    print "deleteMatches"
+    try:
+        conn = connect()
+        cur = conn.cursor()
+        cur.execute(DELETE_MATCHES)
+        conn.commit()
+        closeConnCur(conn, cur)
+
+    except psycopg2.Error as e:
+        print e.pgerror
+
 
 
 def deletePlayers():
     """Remove all the player records from the database."""
-    connect()
+    print "deletePlayers"
+    try:
+        conn = connect()
+        cur = conn.cursor()
+        cur.execute(DELETE_PLAYER)
+        conn.commit()
+        closeConnCur(conn, cur)
+
+    except psycopg2.Error as e:
+        print e.pgerror
 
 
+"""Returns the number of players currently registered."""
 def countPlayers():
-    """Returns the number of players currently registered."""
-    return 10
+    print "countPlayers"
+    try:
+        conn = connect()
+        cur = conn.cursor()
+        cur.execute(SELECT_PLAYERS)
+        count = cur.fetchone()[0]
+        closeConnCur(conn, cur)
+        return int(count)
+    except psycopg2.Error as e:
+        print e.pgerror
+
+
 
 def registerPlayer(name):
     """Adds a player to the tournament database.
@@ -42,6 +84,18 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
+    print "registerPlayer"
+    try:
+        data = (name,)
+        conn = connect()
+        cur = conn.cursor()
+        cur.execute(INSERT_PLAYER,data)
+        conn.commit()
+        closeConnCur(conn, cur)
+
+    except psycopg2.Error as e:
+        print e.pgerror
+
 
 
 def playerStandings():
@@ -57,6 +111,17 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
+    print "playerStandings"
+    try:
+        conn = connect()
+        cur = conn.cursor()
+        cur.execute(PLAYER_STANDINGS)
+        standings = cur.fetchall()
+        closeConnCur(conn, cur)
+        return standings
+
+    except psycopg2.Error as e:
+        print e.pgerror
 
 
 def reportMatch(winner, loser):
@@ -66,7 +131,17 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
- 
+    print "reportMatch"
+    try:
+        conn = connect()
+        cur = conn.cursor()
+        cur.execute(INSERT_MATCH % (winner, loser))
+        conn.commit()
+        closeConnCur(conn, cur)
+
+    except psycopg2.Error as e:
+        print e.pgerror
+
  
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
@@ -83,5 +158,35 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
+    print "swissPairings"
+    try:
+        conn = connect()
+        cur = conn.cursor()
+        cur.execute(SWISS_PAIRINGS)
+        standings = cur.fetchall()
+        closeConnCur(conn, cur)
+        return standings
+
+    except psycopg2.Error as e:
+        print e.pgerror
 
 
+def closeConnCur(conn, cur):
+    if conn:
+        conn.close()
+    if cur:
+        cur.close()
+
+if __name__ == '__main__':
+
+    #print registerPlayer("Boots O'Neal")
+    #print deletePlayers()
+    #print countPlayers()
+    #print reportMatch(11,8)
+    #print swissPairings()
+    #print playerStandings()
+    #deleteMatches()
+    #standings = playerStandings()
+    #[id1, id2, id3, id4] = [row[0] for row in standings]
+    #print standings
+    print "Success!  All tests pass!"

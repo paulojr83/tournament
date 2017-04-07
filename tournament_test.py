@@ -14,6 +14,7 @@ def testCount():
              player count after 1 and 2 players registered,
              player count after players deleted.
     """
+    print "testCount"
     deleteMatches()
     deletePlayers()
     c = countPlayers()
@@ -47,6 +48,7 @@ def testStandingsBeforeMatches():
     Test to ensure players are properly represented in standings prior
     to any matches being reported.
     """
+    print "testStandingsBeforeMatches"
     deleteMatches()
     deletePlayers()
     registerPlayer("Melpomene Murray")
@@ -73,6 +75,7 @@ def testReportMatches():
     Test that matches are reported properly.
     Test to confirm matches are deleted properly.
     """
+    print "testReportMatches"
     deleteMatches()
     deletePlayers()
     registerPlayer("Bruno Walton")
@@ -107,6 +110,7 @@ def testPairings():
     """
     Test that pairings are generated properly both before and after match reporting.
     """
+    print "testPairings"
     deleteMatches()
     deletePlayers()
     registerPlayer("Twilight Sparkle")
