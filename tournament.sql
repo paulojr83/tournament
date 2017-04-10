@@ -6,6 +6,12 @@
 -- You can write comments in this file by starting them with two dashes, like
 -- these lines here.
 
+--drop database if exists
+DROP DATABASE IF EXISTS tournament;
+
+--create database
+CREATE DATABASE tournament;
+
 --create sequence ro player unique id
 CREATE SEQUENCE player_seq;
 -- create table for player
@@ -16,8 +22,11 @@ CREATE TABLE player(
 )
 --create table for matches
 CREATE TABLE matches(
+    "ID" SERIAL,
     "ID_WINNER" integer NOT NULL,
-    "ID_LOSER" integer NOT NULL
+    "ID_LOSER" integer NOT NULL,
+    FOREIGN KEY ("ID_WINNER") REFERENCES PLAYER ("ID"),
+    FOREIGN KEY ("ID_LOSER") REFERENCES PLAYER ("ID")
 )
 -- create view for player standings
 create view PLAYER_STANDINGS as
@@ -39,3 +48,4 @@ CREATE view PAIRINGS as
 SELECT P_WON."ID" AS id1, P_WON."NAME" as name1, P_LOSE."ID" AS id2, P_LOSE."NAME" as name2
 FROM MATCHES A JOIN PLAYER P_WON ON(A."ID_WINNER" = P_WON."ID")
 JOIN PLAYER P_LOSE ON(A."ID_LOSER" = P_LOSE."ID")
+

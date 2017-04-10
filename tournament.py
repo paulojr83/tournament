@@ -9,22 +9,26 @@ SELECT_PLAYERS = "SELECT count(*) FROM player;"
 
 INSERT_PLAYER = """INSERT INTO player("NAME") VALUES (%s);"""
 
-INSERT_MATCH = """INSERT INTO matches("ID_WINNER","ID_LOSER") VALUES (%s, %s);"""
+INSERT_MATCH = """INSERT INTO matches("ID_WINNER","ID_LOSER") 
+                        VALUES (%s, %s);"""
 
 PLAYER_STANDINGS = """SELECT * FROM PLAYER_STANDINGS;"""
 
 SWISS_PAIRINGS = """SELECT * FROM SWISS_PAIRINGS;"""
 
-DELETE_MATCHES = """DELETE FROM matches;"""
+TRUNCATE_MATCHES = """TRUNCATE matches CASCADE;"""
 
-DELETE_PLAYER = """DELETE FROM player;"""
+TRUNCATE_PLAYER = """TRUNCATE player CASCADE;"""
 
-def connect():
+def connect(database_name="tournament"):
     """Connect to the PostgreSQL database.  Returns a database connection."""
     try:
-        conn = psycopg2.connect(host="64.137.162.204",database="postgres", user="postgres", password="12qw")
-        #print "Connected!\n"
-        return conn
+        db = psycopg2.connect(host="64.137.162.204"
+                              , database=database_name
+                              , user="postgres"
+                              , password="12qw")
+        cursor = db.cursor()
+        return db, cursor
     except:
         print "I am unable to connect to the database"
 
@@ -32,11 +36,10 @@ def deleteMatches():
     """Remove all the match records from the database."""
     print "deleteMatches"
     try:
-        conn = connect()
-        cur = conn.cursor()
-        cur.execute(DELETE_MATCHES)
-        conn.commit()
-        closeConnCur(conn, cur)
+        db, cursor = connect()
+        cursor.execute(TRUNCATE_MATCHES)
+        db.commit()
+        closeConnCur(db, cursor)
 
     except psycopg2.Error as e:
         print e.pgerror
@@ -45,11 +48,10 @@ def deletePlayers():
     """Remove all the player records from the database."""
     print "deletePlayers"
     try:
-        conn = connect()
-        cur = conn.cursor()
-        cur.execute(DELETE_PLAYER)
-        conn.commit()
-        closeConnCur(conn, cur)
+        db, cursor = connect()
+        cursor.execute(TRUNCATE_PLAYER)
+        db.commit()
+        closeConnCur(db, cursor)
 
     except psycopg2.Error as e:
         print e.pgerror
@@ -58,11 +60,10 @@ def deletePlayers():
 def countPlayers():
     print "countPlayers"
     try:
-        conn = connect()
-        cur = conn.cursor()
-        cur.execute(SELECT_PLAYERS)
-        count = cur.fetchone()[0]
-        closeConnCur(conn, cur)
+        db, cursor = connect()
+        cursor.execute(SELECT_PLAYERS)
+        count = cursor.fetchone()[0]
+        closeConnCur(db, cursor)
         return int(count)
     except psycopg2.Error as e:
         print e.pgerror
@@ -78,12 +79,11 @@ def registerPlayer(name):
     """
     print "registerPlayer"
     try:
-        data = (name,)
-        conn = connect()
-        cur = conn.cursor()
-        cur.execute(INSERT_PLAYER,data)
-        conn.commit()
-        closeConnCur(conn, cur)
+        parameter = (name,)
+        db, cursor = connect()
+        cursor.execute(INSERT_PLAYER,parameter)
+        db.commit()
+        closeConnCur(db, cursor)
 
     except psycopg2.Error as e:
         print e.pgerror
@@ -103,11 +103,10 @@ def playerStandings():
     """
     print "playerStandings"
     try:
-        conn = connect()
-        cur = conn.cursor()
-        cur.execute(PLAYER_STANDINGS)
-        standings = cur.fetchall()
-        closeConnCur(conn, cur)
+        db, cursor = connect()
+        cursor.execute(PLAYER_STANDINGS)
+        standings = cursor.fetchall()
+        closeConnCur(db, cursor)
         return standings
 
     except psycopg2.Error as e:
@@ -122,11 +121,11 @@ def reportMatch(winner, loser):
     """
     print "reportMatch"
     try:
-        conn = connect()
-        cur = conn.cursor()
-        cur.execute(INSERT_MATCH % (winner, loser))
-        conn.commit()
-        closeConnCur(conn, cur)
+        parameters = (winner,loser)
+        db, cursor = connect()
+        cursor.execute(INSERT_MATCH,parameters)
+        db.commit()
+        closeConnCur(db, cursor)
 
     except psycopg2.Error as e:
         print e.pgerror
@@ -148,11 +147,10 @@ def swissPairings():
     """
     print "swissPairings"
     try:
-        conn = connect()
-        cur = conn.cursor()
-        cur.execute(SWISS_PAIRINGS)
-        standings = cur.fetchall()
-        closeConnCur(conn, cur)
+        db, cursor = connect()
+        cursor.execute(SWISS_PAIRINGS)
+        standings = cursor.fetchall()
+        closeConnCur(db, cursor)
         return standings
 
     except psycopg2.Error as e:
